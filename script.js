@@ -1,0 +1,170 @@
+// var bodyElement = document.getElementsByTagName('BODY')[0];
+var body_Element = document.getElementsByTagName('BODY')[0];
+var grid_div= document.createElement('Div');
+grid_div.setAttribute('class',"calculator-grid")
+body_Element.append(grid_div);
+
+var outputDiv = document.createElement('Div');
+outputDiv.setAttribute('class','output');
+grid_div.append(outputDiv);
+
+var previousOperanddiv = document.createElement('Div');
+previousOperanddiv.setAttribute('class','previous-operand data-previous-operand');
+outputDiv.append(previousOperanddiv);
+
+var currentOperanddiv = document.createElement('Div');
+currentOperanddiv.setAttribute('class','current-operand data-current-operand');
+outputDiv.append(currentOperanddiv);
+
+var acButton = document.createElement('button');
+acButton.innerText="AC";
+acButton.setAttribute('class'," data-all-clear span-two");
+grid_div.append(acButton);
+
+
+var numbers = '1,2,3,4,5,6,7,8,9,.,0'.split(',');
+ for (x=0; x<numbers.length; x++){
+    var button = document.createElement('button');
+    button.innerText= numbers[x];  
+    button.setAttribute('class', "data-number");
+    grid_div.append(button);
+ };
+
+ var operators = '÷,*,+,-'.split(',');
+ for (x=0; x<operators.length; x++){
+    var button = document.createElement('button');
+    button.innerText= operators[x];  
+    button.setAttribute('class', "data-operation");
+    grid_div.append(button);
+ };
+
+ var eqButton = document.createElement('button');
+ eqButton.append('=');
+ eqButton.setAttribute('class', 'data-equals span-two');
+ grid_div.append(eqButton);
+ 
+ var delButton = document.createElement('button');
+delButton.innerText="DEL";
+delButton.setAttribute('class',"dataDelete");
+grid_div.append(delButton);
+
+ function Calculator(previousOperandTextElement, currentOperandTextElement) {
+    this.previousOperandTextElement = previousOperandTextElement;
+    this.currentOperandTextElement = currentOperandTextElement;
+    this.clear();
+}
+Calculator.prototype = {
+
+clear() {
+    this.currentOperand = " ";
+    this.previousOperand = " ";
+    this.operation = undefined;
+},
+
+delete() {
+    // console.log(this.currentOperand.toString().slice(0,-1));
+
+    this.currentOperand= this.currentOperand.toString().slice(0,-1)
+
+},
+
+appendNumber(number) {
+    if (number === '.' && this.currentOperand.includes('.')) {
+        return
+    }
+    this.currentOperand = this.currentOperand.toString() + number;
+},
+
+chooseOperation(operation) {
+   
+    if (this.currentOperand===" "){return};
+    if (this.previousOperand !==' '){
+        this.compute();
+    }
+    
+    this.operation = operation;
+    this.previousOperand = this.currentOperand + operation;
+    this.currentOperand = ' ';
+
+},
+
+compute() {
+    let computation;
+    const prev = parseFloat(this.previousOperand);
+    const current = parseFloat(this.currentOperand);
+    switch (this.operation){
+        case '+':
+            computation = prev + current;
+            break
+          case '-':
+            computation = prev - current;
+            break
+          case '*':
+            computation = prev * current;
+            break
+          case '÷':
+            computation = prev / current;
+            break
+          default:
+            return;
+
+        }
+        this.currentOperand= computation;
+        this.operation=undefined;
+        this.previousOperand= ''
+    },
+
+
+
+updateDisplay() {
+    this.currentOperandTextElement.innerText = this.currentOperand;
+    this.previousOperandTextElement.innerText = this.previousOperand;
+}
+
+}
+
+
+var numberButtons = document.querySelectorAll('.data-number');
+var operationButtons = document.querySelectorAll('.data-operation');
+var equalsButton = document.querySelector('.data-equals');
+var deleteButton = document.querySelector('.dataDelete');
+var allClearButton = document.querySelector('.data-all-clear');
+var previousOperandTextElement = document.querySelector('.data-previous-operand');
+var currentOperandTextElement = document.querySelector('.data-current-operand');
+
+var calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+
+numberButtons.forEach(button => {
+console.log(button);
+button.addEventListener('click', () => {
+    calculator.appendNumber(button.innerText)
+    calculator.updateDisplay();
+})
+})
+
+
+operationButtons.forEach(button => {
+console.log(button);
+button.addEventListener('click', () => {
+    calculator.chooseOperation(button.innerText)
+    calculator.updateDisplay();
+})
+})
+
+equalsButton.addEventListener('click', () => {
+    calculator.compute();
+    calculator.updateDisplay();
+})
+
+allClearButton.onclick = () => {
+    calculator.clear();
+    calculator.updateDisplay();
+    
+}
+
+deleteButton.addEventListener('click', () => {
+    console.log(deleteButton)
+    calculator.delete();
+    calculator.updateDisplay();
+    
+} )
